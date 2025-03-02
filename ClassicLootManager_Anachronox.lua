@@ -137,7 +137,6 @@ local function RegisterMyColumn()
 		PrintTable(manager.externalColumns)
 		
 		manager.BuildColumns(manager)
-		print(manager.BidList)
         -- CLM.GUI.AuctionManager.RegisterExternalColumn(column, ExternalColumnCallback)
     else
         MyPrint("externalColumns not ready. Retrying...")
