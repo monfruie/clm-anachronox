@@ -1,0 +1,12 @@
+## Interface: 40401, 40402, 110007, 11505, 11506, 110100
+## Title: CLM Anachronox
+## Notes: Anachronox extension for CLM
+## Author: Wulfson
+## Category: Loot
+## Group: CLM
+## IconTexture: Interface/AddOns/ClassicLootManager/Media/Icons/clm-dark-32.png
+## Version: v5.5.1
+## RequiredDeps: ClassicLootManager
+## OptionalDeps: LibStub
+
+ClassicLootManager_Anachronox.lua
