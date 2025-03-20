@@ -42,17 +42,17 @@ end
 
 local rankColumn = {
     name = "Rank",
-    width = 60,
+    width = 40,
     color = {r = 0.93, g = 0.70, b = 0.13, a = 1.0},
-    sortnext = 3,
+    sortnext = 4,
     align = "CENTER"
 }
 
 local idColumn = {
     name = "RankId",
-    width = 20,
+    width = 0,
     color = {r = 0.93, g = 0.70, b = 0.13, a = 1.0},
-    sortnext = 3,
+    sortnext = 4,
     align = "CENTER"
 }
 
@@ -108,16 +108,27 @@ local function GetGuildMemberRankId(targetName)
     return 10 - retRank
 end
 
+local function AdjustCols()
+	if CLM.GUI.AuctionManager.BidList.st.cols[3].sortnext == 7 then 
+		return 
+	end
+	CLM.GUI.AuctionManager.BidList.st.cols[3].sortnext=7
+	CLM.GUI.AuctionManager.BidList.st.cols[3].width=60
+	CLM.GUI.AuctionManager.BidList.st.SetDisplayCols(CLM.GUI.AuctionManager.BidList.st,CLM.GUI.AuctionManager.BidList.st.cols)
+end
+	
 
 local function ExternalRankColumnCallback(auction, item, name, response)
 	MyPrint(name)
     local rankName = GetGuildMemberRank(name)
+	AdjustCols()
     return {value = rankName, color = rankColumn.color}
 end
 
 local function ExternalIdColumnCallback(auction, item, name, response)
 	MyPrint(name)
     local rankId = GetGuildMemberRankId(name)
+	
     return {value = rankId, color = idColumn.color}
 end
 			
@@ -148,6 +159,7 @@ local function OnInitialize()
     if CLM.GUI.AuctionManager._initialized and CLM.GUI.AuctionManager.externalColumns then
 		MyPrint("Trying to register...")
         RegisterMyColumn()
+		AdjustCols()
 		MyPrint("Registration success ...")
     else
         -- If AuctionManager is not ready, retry after a delay
@@ -155,60 +167,6 @@ local function OnInitialize()
 		MyPrint("Registration failed trying again soon...")
     end
 end
-
-function CLM.GUI.AuctionManager:BuildColumns()
-    local totalWidth = self.dataWidth - 47
-    local columns = {
-        { name = "", width = 18, DoCellUpdate = UTILS.LibStClassCellUpdate },
-        {name = "Név",  width = 70,
-            comparesort = UTILS.LibStCompareSortWrapper(UTILS.LibStModifierFn), DoCellUpdate = UTILS.LibStNameCellUpdate
-        },
-        {name = CLM.L["Bid"],   width = 50, color = colorGreen,
-            sort = ScrollingTable.SORT_DSC,
---            sortnext = 4,
-            sortnext = 7,
-            align = "CENTER",
-            DoCellUpdate = (function(rowFrame, frame, data, cols, row, realrow, column, fShow, table, ...)
-                table.DoCellUpdate(rowFrame, frame, data, cols, row, realrow, column, fShow, table, ...)
-                frame.text:SetText(data[realrow].cols[column].text or data[realrow].cols[column].value)
-            end)
-        },
-        {name = CLM.L["Current"],  width = 70, color = {r = 0.93, g = 0.70, b = 0.13, a = 1.0},
-            -- sort = ScrollingTable.SORT_DSC, -- This Sort disables nexsort of others relying on this column
-            sortnext = 5,
-            align = "CENTER"
-        },
-        {name = CLM.L["Roll"],  width = 40, color = {r = 0.93, g = 0.70, b = 0.13, a = 1.0},
-            sortnext = 2,
-            align = "CENTER"
-        },
-    }
-    -- Add external columns
-    for _, externalColumn in ipairs(self.externalColumns) do
-        columns[#columns+1] = externalColumn.column
-    end
-    -- Items
-    columns[#columns+1] = {name = "", width = 18, align = "CENTER", DoCellUpdate = UTILS.LibStItemCellUpdate }
-    columns[#columns+1] = {name = "", width = 18, align = "CENTER", DoCellUpdate = UTILS.LibStItemCellUpdate }
-    columns[#columns+1] = {name = "", width = 18, align = "CENTER", DoCellUpdate = UTILS.LibStItemCellUpdate }
-    columns[#columns+1] = {name = "", width = 18, align = "CENTER", DoCellUpdate = UTILS.LibStItemCellUpdate }
-    columns[#columns+1] = {name = "", width = 18, align = "CENTER", DoCellUpdate = UTILS.LibStItemCellUpdate }
-    -- Done
-    local currentWidth = 0
-    for _, c in ipairs(columns) do
-        currentWidth = currentWidth + c.width
-    end
-    local expand = UTILS.round(((totalWidth-currentWidth)/(#columns-3)))
-    for i, _ in ipairs(columns) do
-        if columns[i].name ~= "" then
-            columns[i].width = columns[i].width + expand
-        end
-    end
-
-    self.BidList:SetDisplayCols(columns)
-end
-
-
 
 OnInitialize()
 
